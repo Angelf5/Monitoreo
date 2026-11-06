@@ -4,7 +4,11 @@
     @auth
         <span style="color:#666">{{ auth()->user()->email }}</span>
         @can('viewSecurityDashboard')
-            <a href="{{ route('seguridad.panel') }}" style="color:#1d5fa8">Panel de seguridad</a>
+            <a href="{{ route('seguridad.panel') }}"
+               style="background:#15803d; color:#fff; border:0; border-radius:8px; padding:8px 14px;
+                      font-size:14px; text-decoration:none; display:inline-block; line-height:normal;">
+                Panel de seguridad
+            </a>
         @endcan
         <form method="POST" action="{{ route('logout') }}" style="margin:0">
             @csrf

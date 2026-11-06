@@ -14,6 +14,11 @@
             padding: 24px;
         }
         h1 { margin-top: 0; }
+        .lectura-fecha { color: #666; }
+        .lectura-hora {
+            font-weight: 700; font-variant-numeric: tabular-nums;
+            background: #e8f0fb; color: #1d5fa8; padding: 2px 8px; border-radius: 6px; margin-left: 4px;
+        }
         a { color: #1d5fa8; }
         .grid {
             display: grid;
@@ -51,7 +56,10 @@
     <p><a href="/graficos">Ver gráficos en tiempo real →</a></p>
     <p>
         WebSocket: <span id="estado" class="off">Conectando...</span>
-        · Última lectura: <span id="at">{{ $data['at'] }}</span>
+        · Última lectura:
+        @php($lectura = \Illuminate\Support\Carbon::parse($data['at']))
+        <span id="at-fecha" class="lectura-fecha">{{ $lectura->format('d/m/Y') }}</span>
+        <span id="at-hora" class="lectura-hora">{{ $lectura->format('H:i:s') }}</span>
     </p>
 
     <div class="grid">
@@ -101,11 +109,18 @@
             document.getElementById(id).textContent = valor ?? 'No disponible';
         };
 
+        // Separa la fecha (dd/mm/aaaa) de la hora (hh:mm:ss) para que la hora se lea mejor
+        const mostrarLectura = (iso) => {
+            const fecha = new Date(iso);
+            set('at-fecha', fecha.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' }));
+            set('at-hora', fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }));
+        };
+
         // 1. Métricas: llegan solas cada 5 segundos
         window.Echo.channel('server.metrics')
             .listen('MetricsUpdated', (e) => {
                 const d = e.data;
-                set('at', d.at);
+                mostrarLectura(d.at);
                 set('disk', d.disk.used_pct);
                 set('memory', d.memory?.used_pct);
                 set('cpu', d.cpu_pct);

@@ -40,7 +40,10 @@
     <h1>Gráficos en tiempo real</h1>
     <p>
         <a href="/servidor">← Volver al monitor</a>
-        · Última lectura: <span id="at">esperando datos...</span>
+        · Última lectura:
+        <span id="at-fecha" style="color:#666"></span>
+        <span id="at" style="font-weight:700; font-variant-numeric:tabular-nums; background:#e8f0fb; color:#1d5fa8;
+                               padding:2px 8px; border-radius:6px; margin-left:4px;">esperando datos...</span>
     </p>
 
     <div class="grid">
@@ -129,8 +132,10 @@
         window.Echo.channel('server.metrics')
             .listen('MetricsUpdated', (e) => {
                 const d = e.data;
-                const hora = new Date(d.at).toLocaleTimeString();
+                const fecha = new Date(d.at);
+                const hora = fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
+                document.getElementById('at-fecha').textContent = fecha.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 document.getElementById('at').textContent = hora;
                 agregar('cpu', hora, d.cpu_pct);
                 agregar('memory', hora, d.memory?.used_pct);
